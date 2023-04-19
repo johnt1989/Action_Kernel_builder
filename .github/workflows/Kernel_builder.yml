@@ -1,0 +1,121 @@
+name: Kernel Builder
+
+on:
+  workflow_dispatch:
+    inputs:
+      KERNEL_URL:
+        description: 'KERNEL_URL'
+        required: true
+        default: 'https://github.com/johnt1989/android_kernel_samsung_sm8150'
+      KERNEL_BRANCH:
+        description: 'KERNEL_BRANCH'
+        required: true
+        default: 'NetHunter-test'
+      PARENT_DIR:
+        description: 'PARENT_DIR'
+        required: true
+        default: 'parentdir'
+      BUILD_DIR:
+        description: 'BUILD_DIR'
+        required: true
+        default: 'builddir'
+      DEVICE_NAME:
+        description: 'DEVICE_NAME'
+        required: true
+        default: 'd2q'
+
+jobs:
+  build:
+    if: github.event.repository.owner.id == github.event.sender.id
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Display Run Parameters
+      run: |
+        echo "::group::User Environment Variables"
+        echo "Kernel URL: ${{ github.event.inputs.KERNEL_URL }}"
+        echo "Kernel Branch: ${{ github.event.inputs.KERNEL_BRANCH }}"
+        echo "Parent Directory: ${{ github.event.inputs.PARENT_DIR }}"
+        echo "Build Directory: ${{ github.event.inputs.BUILD_DIR }}"
+        echo "Device Name: ${{ github.event.inputs.DEVICE_NAME }}"
+        echo "::endgroup::"
+
+    - name: Check Out
+      uses: actions/checkout@v3
+
+    - name: Cleanup
+      uses: rokibhasansagar/slimhub_actions@main
+
+    - name: Prepare The Environment
+      run: |
+        sudo apt-get update -y
+        sudo apt-get upgrade -y
+        sudo apt-get install \
+          git gperf groff bc build-essential bison ccache gcc gcc-multilib libstdc++6 g++ g++-multilib dpkg-dev rsync \
+          minicom curl libswitch-perl optipng gettext-base jfsutils flex aria2 zip maven bzip2 unzip wget make tree liblz4-tool -y
+        sudo apt-get update -y
+        sudo apt-get upgrade -y
+        sudo apt install \
+          libzstd-dev lsb-base automake openssl procps pcmciautils squashfs-tools xsltproc pwgen policycoreutils python \
+          python-dev python-all-dev util-linux x11proto-core-dev lzop pngcrush schedtool imagemagick -y
+        sudo apt-get update -y
+        sudo apt-get upgrade -y
+        sudo apt install \
+          lzma ncftp libfuse2 libc6-dev libncursesw5 libncursesw5-dev lib32ncursesw5-dev libfreetype6-dev \
+          libreadline5 lib32readline-dev libssl-dev libpng-dev liblz4-dev libtinfo6 liblzma-dev zlib1g-dev -y
+        sudo apt-get update -y
+        sudo apt-get upgrade -y
+        sudo apt install \
+          libxml-simple-perl libbz2-1.0 libxml-sax-base-perl libwxgtk3.0-gtk3-dev libghc-bzlib-dev libx11-dev lib32z1-dev \
+          libxml2-utils libgl1-mesa-dev libsdl1.2-dev lib32z-dev libxml2 libbz2-dev -y
+
+    - name: Install OpenJDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '8'
+
+    - name: Set Variables
+      run: |
+        echo "::set-output name=date::$(date +%F)"
+      id: var
+
+    - name: Cloning Kernel
+      run: |
+        mkdir ${{ github.event.inputs.PARENT_DIR }} && cd ${{ github.event.inputs.PARENT_DIR }}
+        git clone ${{ github.event.inputs.KERNEL_URL }} -b ${{ github.event.inputs.KERNEL_BRANCH }} ${{ github.event.inputs.BUILD_DIR }}
+        cd ${{ github.event.inputs.BUILD_DIR }}
+        echo "workspace-folder=$(pwd)" >> $GITHUB_OUTPUT
+        git config --global user.name "johnt1989"
+        git config --global user.email "johnjohnt1989@gmail.com"
+      id: pwd
+
+    - name: Check Kernel Branch
+      uses: haya14busa/action-cond@v1
+      id: buildtree
+      with:
+        cond: ${{ github.event.inputs.KERNEL_BRANCH == 'NetHunter-test' || github.event.inputs.KERNEL_BRANCH == '' }}
+        if_true: NetHunter-test
+        if_false:
+
+    - name: Set Swap Space
+      uses: pierotofy/set-swap-space@master
+      with:
+        swap-size-gb: 12
+
+    - name: Building Kernel
+      run: |
+        bash ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/build_d2q.sh
+      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
+
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ${{ github.event.inputs.PARENT_DIR }}/d2q_kernel.zip
+        name: ${{ github.event.inputs.DEVICE_NAME }}-${{ github.run_id }}
+        tag_name: ${{ github.run_id }}
+        body: |
+          Kernel_URL: ${{ github.event.inputs.KERNEL_URL }}
+          Device: ${{ github.event.inputs.DEVICE_NAME }}
+          Target: d2q_kernel.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
