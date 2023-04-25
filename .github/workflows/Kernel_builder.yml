@@ -10,7 +10,7 @@ on:
       KERNEL_BRANCH:
         description: 'KERNEL_BRANCH'
         required: true
-        default: 'NetHunter-test'
+        default: 'testing'
       PARENT_DIR:
         description: 'PARENT_DIR'
         required: true
@@ -95,8 +95,8 @@ jobs:
       uses: haya14busa/action-cond@v1
       id: buildtree
       with:
-        cond: ${{ github.event.inputs.KERNEL_BRANCH == 'NetHunter-test' || github.event.inputs.KERNEL_BRANCH == '' }}
-        if_true: NetHunter-test
+        cond: ${{ github.event.inputs.KERNEL_BRANCH == 'testing' || github.event.inputs.KERNEL_BRANCH == '' }}
+        if_true: testing
         if_false:
 
     - name: Set Swap Space
