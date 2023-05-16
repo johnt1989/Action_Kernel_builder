@@ -106,6 +106,7 @@ jobs:
 
     - name: Building Kernel
       run: |
+        sudo chmod +x ${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/tools/*
         bash ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/build_d2q.sh
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
