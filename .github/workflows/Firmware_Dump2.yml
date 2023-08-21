@@ -1,4 +1,4 @@
-name: Firmware Dump2
+name: Firmware Dump
 
 on:
   workflow_dispatch:
@@ -63,12 +63,13 @@ jobs:
 
     - name: Cloning Firmware
       run: |
-        chmod +x ${{ github.event.inputs.WFOLDER }}/dumper.sh
-        chmod +x ${{ github.event.inputs.WFOLDER }}/setup.sh
+        ls
       working-directory: workspace
       
     - name: Run Bash 1
       run: |
+        chmod +x ${{ github.event.inputs.WFOLDER }}/dumper.sh
+        chmod +x ${{ github.event.inputs.WFOLDER }}/setup.sh
         bash ${{ github.event.inputs.WFOLDER }}/setup.sh
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
