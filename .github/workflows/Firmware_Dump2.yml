@@ -68,6 +68,7 @@ jobs:
       
     - name: Run Bash 1
       run: |
+        pip install --upgrade wheel setuptools
         chmod +x ${{ github.event.inputs.WFOLDER }}/dumper.sh
         chmod +x ${{ github.event.inputs.WFOLDER }}/setup.sh
         bash ${{ github.event.inputs.WFOLDER }}/setup.sh
