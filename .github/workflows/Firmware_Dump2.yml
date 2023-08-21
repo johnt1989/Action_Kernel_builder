@@ -18,7 +18,7 @@ on:
       WFOLDER:
         description: 'work folder'
         required: true
-        default: 'workspace'
+        default: 'work'
 
 jobs:
   build:
@@ -54,16 +54,16 @@ jobs:
 
     - name: Setup
       run: |
+        mkdir workspace
+        cd workspace
         git config --global user.name "johnt1989"
         git config --global user.email "johnjohnt1989@gmail.com"
-        git clone ${{ github.event.inputs.TOOL_URL }} -b ${{ github.event.inputs.TOOL_BRANCH }} ${{ github.event.inputs.WFOLDER }}
-        cd ${{ github.event.inputs.WFOLDER }}
         echo "workspace-folder=$(pwd)" >> $GITHUB_OUTPUT
       id: pwd
 
     - name: Work folder
       run: |
-        ls
+        git clone ${{ github.event.inputs.TOOL_URL }} -b ${{ github.event.inputs.TOOL_BRANCH }} ${{ github.event.inputs.WFOLDER }}
       working-directory: workspace
       
     - name: Run Bash 1
