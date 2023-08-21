@@ -61,7 +61,7 @@ jobs:
         echo "workspace-folder=$(pwd)" >> $GITHUB_OUTPUT
       id: pwd
 
-    - name: Cloning Firmware
+    - name: Work folder
       run: |
         ls
       working-directory: workspace
