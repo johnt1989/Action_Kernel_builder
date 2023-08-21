@@ -70,14 +70,14 @@ jobs:
       run: |
         chmod +x ${{ github.event.inputs.WFOLDER }}/dumper.sh
         chmod +x ${{ github.event.inputs.WFOLDER }}/setup.sh
-        sudo bash ${{ github.event.inputs.WFOLDER }}/setup.sh
+        bash ${{ github.event.inputs.WFOLDER }}/setup.sh
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
     - name: Run Bash 2
       run: |
         cd ${{ github.event.inputs.WFOLDER }}
-        cd ..
         wget ${{ github.event.inputs.FIRMWARE_URL }}
+        cd ..
         bash ${{ github.event.inputs.WFOLDER }}/dumper.sh
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
