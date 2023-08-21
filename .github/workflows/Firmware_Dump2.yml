@@ -1,0 +1,83 @@
+name: Firmware Dump2
+
+on:
+  workflow_dispatch:
+    inputs:
+      TOOL_URL:
+        description: 'Firmware tool url'
+        required: true
+        default: 'https://github.com/johnt1989/Firmware'
+      TOOL_BRANCH:
+        description: 'tool branch'
+        required: true
+        default: 'dev'
+      FIRMWARE_URL:
+        description: 'firmware URL'
+        required: true
+        default: 'https://mgb1.androidfilehost.com/dl/RFqT8MRP-sIVlwyOotfwRg/1692720546/10620683726822057191/BIT5_SAFE_N975USQU7HWE1.zip'
+      WFOLDER:
+        description: 'work folder'
+        required: true
+        default: 'workspace'
+
+jobs:
+  build:
+    if: github.event.repository.owner.id == github.event.sender.id
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: write
+    steps:
+    - name: Display Run Parameters
+      run: |
+        echo "::group::User Environment Variables"
+        echo "Tool URL: ${{ github.event.inputs.TOOL_URL }}"
+        echo "Tool Branch: ${{ github.event.inputs.TOOL_BRANCH }}"
+        echo "Firmware URL: ${{ github.event.inputs.FIRMWARE_URL }}"
+        echo "Work Folder: ${{ github.event.inputs.WFOLDER }}"
+        echo "::endgroup::"
+
+    # You might want to Checkout your repo first, but not mandatory
+    - name: Check Out
+      uses: actions/checkout@v3
+
+    - name: Prepare the environment
+      run: |
+        sudo apt update
+        sudo apt -y upgrade
+        sudo apt -y install gperf gcc-multilib gcc-10-multilib g++-multilib g++-10-multilib libc6-dev lib32ncurses5-dev x11proto-core-dev libx11-dev tree lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc bc ccache lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk3.0-gtk3-dev libxml2 lzop pngcrush schedtool squashfs-tools imagemagick libbz2-dev lzma ncftp qemu-user-static libstdc++-10-dev libncurses5 python
+
+    - name: Install OpenJDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '8'
+
+    - name: Setup
+      run: |
+        git config --global user.name "johnt1989"
+        git config --global user.email "johnjohnt1989@gmail.com"
+        git clone ${{ github.event.inputs.TOOL_URL }} -b ${{ github.event.inputs.TOOL_BRANCH }} ${{ github.event.inputs.WFOLDER }}
+        cd ${{ github.event.inputs.WFOLDER }}
+        echo "workspace-folder=$(pwd)" >> $GITHUB_OUTPUT
+      id: pwd
+
+    - name: Cloning Firmware
+      run: |
+        chmod +x ${{ github.event.inputs.WFOLDER }}/dumper.sh
+        chmod +x ${{ github.event.inputs.WFOLDER }}/setup.sh
+      working-directory: workspace
+      
+    - name: Run Bash 1
+      run: |
+        bash ${{ github.event.inputs.WFOLDER }}/setup.sh
+      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
+
+    - name: Run Bash 2
+      run: |
+        bash ${{ github.event.inputs.WFOLDER }}/dumper.sh ${{ github.event.inputs.FIRMWARE_URL }}
+      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
+
+    - name: Set Swap Space
+      uses: pierotofy/set-swap-space@master
+      with:
+        swap-size-gb: 12
