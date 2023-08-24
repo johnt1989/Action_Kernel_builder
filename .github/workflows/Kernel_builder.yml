@@ -10,7 +10,7 @@ on:
       KERNEL_BRANCH:
         description: 'KERNEL_BRANCH'
         required: true
-        default: 'HWB2-doc'
+        default: 'test'
       PARENT_DIR:
         description: 'PARENT_DIR'
         required: true
@@ -95,8 +95,8 @@ jobs:
       uses: haya14busa/action-cond@v1
       id: buildtree
       with:
-        cond: ${{ github.event.inputs.KERNEL_BRANCH == 'HWB2-doc' || github.event.inputs.KERNEL_BRANCH == '' }}
-        if_true: HWB2-doc
+        cond: ${{ github.event.inputs.KERNEL_BRANCH == 'test' || github.event.inputs.KERNEL_BRANCH == '' }}
+        if_true: test
         if_false:
 
     - name: Set Swap Space
