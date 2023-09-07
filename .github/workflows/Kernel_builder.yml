@@ -1,4 +1,4 @@
-name: Kernel Builder
+name: Kernel Build
 
 on:
   workflow_dispatch:
@@ -6,11 +6,11 @@ on:
       KERNEL_URL:
         description: 'KERNEL_URL'
         required: true
-        default: 'https://github.com/johnt1989/testing'
+        default: 'https://github.com/johnt1989/android_kernel_samsung_sm8150.git'
       KERNEL_BRANCH:
         description: 'KERNEL_BRANCH'
         required: true
-        default: 'test'
+        default: 'SamDragon_855'
       PARENT_DIR:
         description: 'PARENT_DIR'
         required: true
@@ -22,7 +22,7 @@ on:
       DEVICE_NAME:
         description: 'DEVICE_NAME'
         required: true
-        default: 'kona'
+        default: 'd2q'
 
 jobs:
   build:
@@ -52,7 +52,7 @@ jobs:
         sudo apt-get update -y
         sudo apt-get upgrade -y
         sudo apt-get install \
-          git gperf groff bc build-essential bison ccache gcc gcc-multilib libstdc++6 g++ g++-multilib dpkg-dev rsync \
+          git gperf groff bc build-essential bison ccache gcc gcc-multilib libstdc++6 g++ g++-multilib dpkg-dev \
           minicom curl libswitch-perl optipng gettext-base jfsutils flex aria2 zip maven bzip2 unzip wget make tree liblz4-tool -y
         sudo apt-get update -y
         sudo apt-get upgrade -y
@@ -95,8 +95,8 @@ jobs:
       uses: haya14busa/action-cond@v1
       id: buildtree
       with:
-        cond: ${{ github.event.inputs.KERNEL_BRANCH == 'test' || github.event.inputs.KERNEL_BRANCH == '' }}
-        if_true: test
+        cond: ${{ github.event.inputs.KERNEL_BRANCH == 'SamDragon_855' || github.event.inputs.KERNEL_BRANCH == '' }}
+        if_true: SamDragon_855
         if_false:
 
     - name: Set Swap Space
@@ -106,18 +106,25 @@ jobs:
 
     - name: Building Kernel
       run: |
-        bash ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/DrBrown28.sh
+        chmod +x ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/tools/dtc
+        chmod +x ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/tools/minigzip
+        chmod +x ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/tools/mkbootfs
+        chmod +x ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/tools/mkbootimg
+        chmod +x ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/tools/mkdtimg
+        chmod +x ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/tools/signclient.jar
+        chmod +x ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/tools/ufdt_apply_overlay
+        bash ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/build_d2q.sh
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v1
       with:
-        files: ${{ github.event.inputs.PARENT_DIR }}/kona_kernel.zip
+        files: ${{ github.event.inputs.PARENT_DIR }}/d2q_flashable_kernel_*
         name: ${{ github.event.inputs.DEVICE_NAME }}-${{ github.run_id }}
         tag_name: ${{ github.run_id }}
         body: |
           Kernel_URL: ${{ github.event.inputs.KERNEL_URL }}
           Device: ${{ github.event.inputs.DEVICE_NAME }}
-          Target: kona_kernel.zip
+          Target: d2q_flashable_kernel_*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
