@@ -10,7 +10,7 @@ on:
       KERNEL_BRANCH:
         description: 'KERNEL_BRANCH'
         required: true
-        default: 'SamDragon_855'
+        default: 'a12'
       PARENT_DIR:
         description: 'PARENT_DIR'
         required: true
@@ -95,8 +95,8 @@ jobs:
       uses: haya14busa/action-cond@v1
       id: buildtree
       with:
-        cond: ${{ github.event.inputs.KERNEL_BRANCH == 'SamDragon_855' || github.event.inputs.KERNEL_BRANCH == '' }}
-        if_true: SamDragon_855
+        cond: ${{ github.event.inputs.KERNEL_BRANCH == 'a12' || github.event.inputs.KERNEL_BRANCH == '' }}
+        if_true: a12
         if_false:
 
     - name: Set Swap Space
@@ -119,12 +119,12 @@ jobs:
     - name: Upload to Release
       uses: softprops/action-gh-release@v1
       with:
-        files: ${{ github.event.inputs.PARENT_DIR }}/d2q_flashable_kernel_*
+        files: ${{ github.event.inputs.PARENT_DIR }}/d2q_kernel_*
         name: ${{ github.event.inputs.DEVICE_NAME }}-${{ github.run_id }}
         tag_name: ${{ github.run_id }}
         body: |
           Kernel_URL: ${{ github.event.inputs.KERNEL_URL }}
           Device: ${{ github.event.inputs.DEVICE_NAME }}
-          Target: d2q_flashable_kernel_*
+          Target: d2q_kernel_*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
