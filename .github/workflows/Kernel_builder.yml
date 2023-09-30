@@ -106,7 +106,7 @@ jobs:
 
     - name: Building Kernel
       run: |
-        bash ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/build_d2q.sh
+        bash ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/build_kern.sh
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
     - name: Upload to Release
