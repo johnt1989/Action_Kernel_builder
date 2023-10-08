@@ -6,11 +6,11 @@ on:
       KERNEL_URL:
         description: 'KERNEL_URL'
         required: true
-        default: 'https://github.com/johnt1989/android_kernel_samsung_sm8150'
+        default: 'https://github.com/johnt1989/android_kernel_nubia_sm8350'
       KERNEL_BRANCH:
         description: 'KERNEL_BRANCH'
         required: true
-        default: 'a12'
+        default: 'android-12.1'
       PARENT_DIR:
         description: 'PARENT_DIR'
         required: true
@@ -22,7 +22,7 @@ on:
       DEVICE_NAME:
         description: 'DEVICE_NAME'
         required: true
-        default: 'd2q'
+        default: 'nx669j'
 
 jobs:
   build:
@@ -95,8 +95,8 @@ jobs:
       uses: haya14busa/action-cond@v1
       id: buildtree
       with:
-        cond: ${{ github.event.inputs.KERNEL_BRANCH == 'a12' || github.event.inputs.KERNEL_BRANCH == '' }}
-        if_true: a12
+        cond: ${{ github.event.inputs.KERNEL_BRANCH == 'android-12.1' || github.event.inputs.KERNEL_BRANCH == '' }}
+        if_true: android-12.1
         if_false:
 
     - name: Set Swap Space
@@ -106,25 +106,18 @@ jobs:
 
     - name: Building Kernel
       run: |
-        chmod +x ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/tools/dtc
-        chmod +x ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/tools/minigzip
-        chmod +x ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/tools/mkbootfs
-        chmod +x ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/tools/mkbootimg
-        chmod +x ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/tools/mkdtimg
-        chmod +x ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/tools/signclient.jar
-        chmod +x ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/tools/ufdt_apply_overlay
-        bash ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/build_d2q.sh
+        bash ${GITHUB_WORKSPACE}/${{ github.event.inputs.PARENT_DIR }}/${{ github.event.inputs.BUILD_DIR }}/Build_nx669j.sh
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v1
       with:
-        files: ${{ github.event.inputs.PARENT_DIR }}/d2q_kernel_*
+        files: ${{ github.event.inputs.PARENT_DIR }}/nx669j_kernel_*
         name: ${{ github.event.inputs.DEVICE_NAME }}-${{ github.run_id }}
         tag_name: ${{ github.run_id }}
         body: |
           Kernel_URL: ${{ github.event.inputs.KERNEL_URL }}
           Device: ${{ github.event.inputs.DEVICE_NAME }}
-          Target: d2q_kernel_*
+          Target: nx669j_kernel_*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
