@@ -56,12 +56,12 @@ jobs:
           minicom curl libswitch-perl optipng gettext-base jfsutils flex aria2 zip maven bzip2 unzip wget make tree liblz4-tool -y
         sudo apt-get update -y
         sudo apt-get upgrade -y
-        sudo apt install \
+        sudo apt-get install \
           libzstd-dev lsb-base automake openssl procps pcmciautils squashfs-tools xsltproc pwgen policycoreutils python3 \
-          python-dev python-all-dev util-linux x11proto-core-dev lzop pngcrush schedtool imagemagick -y
+          python-all-dev util-linux x11proto-core-dev lzop pngcrush schedtool imagemagick -y
         sudo apt-get update -y
         sudo apt-get upgrade -y
-        sudo apt install \
+        sudo apt-get install \
           lzma ncftp libfuse2 libc6-dev libncursesw5 libncursesw5-dev lib32ncursesw5-dev libfreetype6-dev \
           libreadline5 lib32readline-dev libssl-dev libpng-dev liblz4-dev libtinfo6 liblzma-dev zlib1g-dev -y
         sudo apt-get update -y
